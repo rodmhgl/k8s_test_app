@@ -20,6 +20,11 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      deployments: write
     
     env:
       IMAGE_NAME: k8s-test-app
