@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: k8s-test-app
+  repository: ghcr.io/rodmhgl/k8s-test-app
   tag: latest
   pullPolicy: IfNotPresent
 
