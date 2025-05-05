@@ -1,0 +1,314 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Test App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7f9;
+            color: #333;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success {
+            background-color: #2ecc71;
+        }
+        .status-warning {
+            background-color: #f39c12;
+        }
+        .status-error {
+            background-color: #e74c3c;
+        }
+        .status-neutral {
+            background-color: #95a5a6;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 8px;
+        }
+        .info-label {
+            flex: 0 0 150px;
+            font-weight: bold;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .env-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .env-table th, .env-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .env-table th {
+            background-color: #f9f9f9;
+        }
+        .env-table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .refresh-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        .refresh-btn:hover {
+            background-color: #2980b9;
+        }
+        .timestamp {
+            text-align: center;
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kubernetes Test Application</h1>
+            <p>A simple web app for testing Kubernetes deployments</p>
+        </header>
+        
+        <button id="refreshBtn" class="refresh-btn">Refresh Status</button>
+        <div id="timestamp" class="timestamp"></div>
+        
+        <div class="card" id="podInfo">
+            <h2>Pod Information</h2>
+            <div class="content">Loading...</div>
+        </div>
+        
+        <div class="card" id="environmentInfo">
+            <h2>Environment</h2>
+            <div class="content">Loading...</div>
+        </div>
+        
+        <div class="card" id="pvcInfo">
+            <h2>Persistent Volume Claim (PVC)</h2>
+            <div class="content">Loading...</div>
+        </div>
+        
+        <div class="card" id="databaseInfo">
+            <h2>Database Connection</h2>
+            <div class="content">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchStatus();
+            
+            document.getElementById('refreshBtn').addEventListener('click', fetchStatus);
+        });
+        
+        function fetchStatus() {
+            fetch('/api/status')
+                .then(response => response.json())
+                .then(data => {
+                    updatePodInfo(data.pod);
+                    updateEnvironmentInfo(data.environment);
+                    updatePvcInfo(data.pvc);
+                    updateDatabaseInfo(data.database);
+                    
+                    // Update timestamp
+                    const timestamp = new Date(data.timestamp);
+                    document.getElementById('timestamp').textContent = 
+                        `Last updated: ${timestamp.toLocaleString()}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching status:', error);
+                    document.querySelectorAll('.content').forEach(el => {
+                        el.innerHTML = `<div class="status-indicator status-error"></div> Error loading data`;
+                    });
+                });
+        }
+        
+        function updatePodInfo(podData) {
+            let html = `
+                <div class="info-row">
+                    <div class="info-label">Pod Name:</div>
+                    <div class="info-value">${podData.name}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">IP Address:</div>
+                    <div class="info-value">${podData.ip}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Operating System:</div>
+                    <div class="info-value">${podData.os} (${podData.platform})</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Memory:</div>
+                    <div class="info-value">Total: ${podData.memory.total}, Free: ${podData.memory.free}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">CPUs:</div>
+                    <div class="info-value">${podData.cpus}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Uptime:</div>
+                    <div class="info-value">${podData.uptime}</div>
+                </div>
+            `;
+            
+            document.querySelector('#podInfo .content').innerHTML = html;
+        }
+        
+        function updateEnvironmentInfo(envData) {
+            const statusClass = envData.configured ? 'status-success' : 'status-warning';
+            
+            let html = `
+                <div class="info-row">
+                    <div class="info-label">Status:</div>
+                    <div class="info-value">
+                        <div class="status-indicator ${statusClass}"></div>
+                        ${envData.configured ? 'Environment configured' : 'Environment not explicitly configured'}
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Current Environment:</div>
+                    <div class="info-value">${envData.current}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Environment Variables:</div>
+                    <div class="info-value">
+                        <details>
+                            <summary>Show all environment variables</summary>
+                            <table class="env-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Value</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            `;
+            
+            for (const [key, value] of Object.entries(envData.variables)) {
+                html += `
+                    <tr>
+                        <td>${key}</td>
+                        <td>${value}</td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                                </tbody>
+                            </table>
+                        </details>
+                    </div>
+                </div>
+            `;
+            
+            document.querySelector('#environmentInfo .content').innerHTML = html;
+        }
+        
+        function updatePvcInfo(pvcData) {
+            let statusClass = 'status-neutral';
+            if (pvcData.configured) {
+                statusClass = pvcData.accessible ? 'status-success' : 'status-error';
+            }
+            
+            let html = `
+                <div class="info-row">
+                    <div class="info-label">Status:</div>
+                    <div class="info-value">
+                        <div class="status-indicator ${statusClass}"></div>
+                        ${pvcData.message}
+                    </div>
+                </div>
+            `;
+            
+            if (pvcData.configured) {
+                html += `
+                    <div class="info-row">
+                        <div class="info-label">Path:</div>
+                        <div class="info-value">${pvcData.path}</div>
+                    </div>
+                `;
+                
+                if (pvcData.accessible) {
+                    html += `
+                        <div class="info-row">
+                            <div class="info-label">Type:</div>
+                            <div class="info-value">${pvcData.isDirectory ? 'Directory' : 'File'}</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            document.querySelector('#pvcInfo .content').innerHTML = html;
+        }
+        
+        function updateDatabaseInfo(dbData) {
+            let statusClass = 'status-neutral';
+            if (dbData.configured) {
+                statusClass = dbData.connected ? 'status-success' : 'status-error';
+            }
+            
+            let html = `
+                <div class="info-row">
+                    <div class="info-label">Status:</div>
+                    <div class="info-value">
+                        <div class="status-indicator ${statusClass}"></div>
+                        ${dbData.message}
+                    </div>
+                </div>
+            `;
+            
+            if (dbData.configured) {
+                html += `
+                    <div class="info-row">
+                        <div class="info-label">Type:</div>
+                        <div class="info-value">${dbData.type}</div>
+                    </div>
+                `;
+            }
+            
+            document.querySelector('#databaseInfo .content').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
