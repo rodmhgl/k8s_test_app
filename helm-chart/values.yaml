@@ -1,0 +1,23 @@
+replicaCount: 1
+
+image:
+  repository: k8s-test-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 3000
+  nodePort: 30080
+
+environment: "development"
+
+database:
+  enabled: true
+  connectionString: "postgres://user:password@postgres-service:5432/testdb"
+
+persistentVolume:
+  enabled: true
+  size: 1Gi
+  mountPath: /data

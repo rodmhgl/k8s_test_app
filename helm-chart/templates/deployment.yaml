@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+    chart: {{ .Chart.Name }}-{{ .Chart.Version }}
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: {{ .Values.service.targetPort }}
+        env:
+        - name: ENVIRONMENT
+          value: {{ .Values.environment | quote }}
+        {{- if .Values.database.enabled }}
+        - name: DB_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Release.Name }}-db-secret
+              key: DB_CONNECTION_STRING
+        {{- end }}
+        {{- if .Values.persistentVolume.enabled }}
+        - name: PVC_PATH
+          value: {{ .Values.persistentVolume.mountPath | quote }}
+        volumeMounts:
+        - name: test-data
+          mountPath: {{ .Values.persistentVolume.mountPath }}
+        {{- end }}
+      {{- if .Values.persistentVolume.enabled }}
+      volumes:
+      - name: test-data
+        persistentVolumeClaim:
+          claimName: {{ .Release.Name }}-pvc
+      {{- end }}
