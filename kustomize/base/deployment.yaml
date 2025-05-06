@@ -13,28 +13,35 @@ spec:
         app: k8s-test-app
     spec:
       containers:
-      - name: k8s-test-app
-        image: k8s-test-app:latest
-        imagePullPolicy: IfNotPresent
-        ports:
-        - containerPort: 3000
-        env:
-        - name: ENVIRONMENT
-          valueFrom:
-            configMapKeyRef:
-              name: k8s-test-app-config
-              key: ENVIRONMENT
-        - name: DB_CONNECTION_STRING
-          valueFrom:
-            secretKeyRef:
-              name: k8s-test-app-db-secret
-              key: DB_CONNECTION_STRING
-        - name: PVC_PATH
-          value: "/data"
-        volumeMounts:
-        - name: test-data
-          mountPath: /data
+        - name: k8s-test-app
+          image: ghcr.io/rodmhgl/k8s-test-app:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: k8s-test-app-config
+                  key: ENVIRONMENT
+            - name: DB_CONNECTION_STRING
+              valueFrom:
+                secretKeyRef:
+                  name: k8s-test-app-db-secret
+                  key: DB_CONNECTION_STRING
+            - name: PVC_PATH
+              value: "/data"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          volumeMounts:
+            - name: test-data
+              mountPath: /data
       volumes:
-      - name: test-data
-        persistentVolumeClaim:
-          claimName: k8s-test-app-pvc
+        - name: test-data
+          persistentVolumeClaim:
+            claimName: k8s-test-app-pvc
