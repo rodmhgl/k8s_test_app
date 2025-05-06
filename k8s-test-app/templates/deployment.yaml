@@ -18,8 +18,8 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository | default "ghcr.io/rodmhgl/k8s-test-app" }}:{{ .Values.image.tag | default latest}}"
-        imagePullPolicy: {{ .Values.image.pullPolicy | default IfNotPresent }}
+        image: "{{ .Values.image.repository | default "ghcr.io/rodmhgl/k8s-test-app" }}:{{ .Values.image.tag | default "latest"}}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
         ports:
         - containerPort: {{ .Values.service.targetPort | default 3000 }}
         env:
