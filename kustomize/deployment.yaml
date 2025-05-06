@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8s-test-app
+  namespace: k8s-test-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8s-test-app
+  template:
+    metadata:
+      labels:
+        app: k8s-test-app
+    spec:
+      containers:
+      - name: k8s-test-app
+        image: k8s-test-app:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        env:
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: k8s-test-app-config
+              key: ENVIRONMENT
+        - name: DB_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: k8s-test-app-db-secret
+              key: DB_CONNECTION_STRING
+        - name: PVC_PATH
+          value: "/data"
+        volumeMounts:
+        - name: test-data
+          mountPath: /data
+      volumes:
+      - name: test-data
+        persistentVolumeClaim:
+          claimName: k8s-test-app-pvc

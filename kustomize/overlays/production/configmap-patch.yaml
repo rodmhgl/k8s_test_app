@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: k8s-test-app-config
+  namespace: k8s-test-app
+data:
+  ENVIRONMENT: "production"
