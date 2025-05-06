@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: k8s-test-app
-  namespace: k8s-test-app
 spec:
   replicas: 1
   selector:
