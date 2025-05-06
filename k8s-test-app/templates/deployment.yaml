@@ -7,7 +7,7 @@ metadata:
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ .Values.replicaCount | default 1}}
   selector:
     matchLabels:
       app: {{ .Release.Name }}
@@ -18,10 +18,10 @@ spec:
     spec:
       containers:
       - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.repository | default "ghcr.io/rodmhgl/k8s-test-app" }}:{{ .Values.image.tag | default latest}}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | default IfNotPresent }}
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - containerPort: {{ .Values.service.targetPort | default 3000 }}
         env:
         - name: ENVIRONMENT
           value: {{ .Values.environment | quote }}
@@ -34,10 +34,10 @@ spec:
         {{- end }}
         {{- if .Values.persistentVolume.enabled }}
         - name: PVC_PATH
-          value: {{ .Values.persistentVolume.mountPath | quote }}
+          value: {{ .Values.persistentVolume.mountPath | default "/data" | quote }}
         volumeMounts:
         - name: test-data
-          mountPath: {{ .Values.persistentVolume.mountPath }}
+          mountPath: {{ .Values.persistentVolume.mountPath | default "/data" | quote }}
         {{- end }}
       {{- if .Values.persistentVolume.enabled }}
       volumes:
