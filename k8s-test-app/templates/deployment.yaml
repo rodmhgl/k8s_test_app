@@ -1,40 +1,50 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}
+  name: {{ .Values.namePrefix }}k8s-test-app
   labels:
-    app: {{ .Release.Name }}
+    app: k8s-test-app
     chart: {{ .Chart.Name }}-{{ .Chart.Version }}
     release: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount | default 1}}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: k8s-test-app
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: k8s-test-app
     spec:
       containers:
-      - name: {{ .Chart.Name }}
+      - name: k8s-test-app
         image: "{{ .Values.image.repository | default "ghcr.io/rodmhgl/k8s-test-app" }}:{{ .Values.image.tag | default "latest"}}"
         imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
         ports:
         - containerPort: {{ .Values.service.targetPort | default 3000 }}
         env:
         - name: ENVIRONMENT
-          value: {{ .Values.environment | quote }}
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.namePrefix }}k8s-test-app-config
+              key: ENVIRONMENT
         {{- if .Values.database.enabled }}
         - name: DB_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
-              name: {{ .Release.Name }}-db-secret
+              name: {{ .Values.namePrefix }}k8s-test-app-db-secret
               key: DB_CONNECTION_STRING
         {{- end }}
         {{- if .Values.persistentVolume.enabled }}
         - name: PVC_PATH
           value: {{ .Values.persistentVolume.mountPath | default "/data" | quote }}
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
         volumeMounts:
         - name: test-data
           mountPath: {{ .Values.persistentVolume.mountPath | default "/data" | quote }}
@@ -43,5 +53,5 @@ spec:
       volumes:
       - name: test-data
         persistentVolumeClaim:
-          claimName: {{ .Release.Name }}-pvc
+          claimName: {{ .Values.namePrefix }}k8s-test-app-pvc
       {{- end }}
