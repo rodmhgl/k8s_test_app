@@ -1,0 +1,3 @@
+namePrefix: "prod-"
+environment: "production"
+replicaCount: 3

@@ -1,13 +1,18 @@
+namePrefix: ""
 replicaCount: 1
 
 image:
   repository: ghcr.io/rodmhgl/k8s-test-app
   tag: "latest"
+  pullPolicy: IfNotPresent
 
 environment: "development"
 
 service:
   type: NodePort
+  port: 80
+  targetPort: 3000
+  nodePort: 30080
 
 database:
   enabled: true
@@ -15,5 +20,5 @@ database:
 
 persistentVolume:
   enabled: true
-  # size: 1Gi
-  # mountPath: /data
+  size: 1Gi
+  mountPath: /data
