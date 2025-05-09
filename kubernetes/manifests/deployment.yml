@@ -27,6 +27,11 @@ spec:
                 configMapKeyRef:
                   name: k8s-test-app-config
                   key: ENVIRONMENT
+            - name: COLOR_THEME
+              valueFrom:
+                configMapKeyRef:
+                  name: k8s-test-app-config
+                  key: COLOR_THEME
             - name: DB_CONNECTION_STRING
               valueFrom:
                 secretKeyRef:
