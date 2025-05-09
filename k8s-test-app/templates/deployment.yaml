@@ -28,6 +28,11 @@ spec:
             configMapKeyRef:
               name: {{ .Values.namePrefix }}k8s-test-app-config
               key: ENVIRONMENT
+        - name: COLOR_THEME
+          valueFrom:
+            configMapKeyRef:
+              name: {{ .Values.namePrefix }}k8s-test-app-config
+              key: COLOR_THEME
         {{- if .Values.database.enabled }}
         - name: DB_CONNECTION_STRING
           valueFrom:

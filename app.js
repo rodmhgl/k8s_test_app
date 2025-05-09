@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 3000;
 // Database connection test
 async function testDbConnection() {
   const connectionString = process.env.DB_CONNECTION_STRING;
-  
+
   if (!connectionString) {
     return {
       configured: false,
@@ -24,13 +24,13 @@ async function testDbConnection() {
   if (connectionString.includes('postgres')) dbType = 'postgres';
   else if (connectionString.includes('mysql')) dbType = 'mysql';
   else if (connectionString.includes('mongodb')) dbType = 'mongodb';
-  
+
   try {
     let connected = false;
     let message = '';
-    
+
     // Simple ping based on database type
-    switch(dbType) {
+    switch (dbType) {
       case 'postgres':
         const { Pool } = require('pg');
         const pool = new Pool({ connectionString });
@@ -40,7 +40,7 @@ async function testDbConnection() {
         connected = true;
         message = `Connected to PostgreSQL, server time: ${result.rows[0].now}`;
         break;
-        
+
       case 'mysql':
         const mysql = require('mysql2/promise');
         const mysqlConn = await mysql.createConnection(connectionString);
@@ -49,7 +49,7 @@ async function testDbConnection() {
         connected = true;
         message = `Connected to MySQL, server time: ${rows[0].now}`;
         break;
-        
+
       case 'mongodb':
         const { MongoClient } = require('mongodb');
         const mongoClient = new MongoClient(connectionString);
@@ -60,12 +60,12 @@ async function testDbConnection() {
         connected = true;
         message = `Connected to MongoDB, version: ${serverInfo.version}`;
         break;
-        
+
       default:
         message = `Unknown database type for connection string`;
         connected = false;
     }
-    
+
     return {
       configured: true,
       connected,
@@ -85,7 +85,7 @@ async function testDbConnection() {
 // PVC test 
 async function testPvc() {
   const pvcPath = process.env.PVC_PATH;
-  
+
   if (!pvcPath) {
     return {
       configured: false,
@@ -93,19 +93,19 @@ async function testPvc() {
       message: "PVC not configured (no path provided)"
     };
   }
-  
+
   try {
     // Test if directory exists
     const stats = fs.statSync(pvcPath);
-    
+
     // Try to write a test file
     const testFile = path.join(pvcPath, 'pvc-test.txt');
     const timestamp = new Date().toISOString();
     fs.writeFileSync(testFile, `PVC test at ${timestamp}`);
-    
+
     // Read it back
     const content = fs.readFileSync(testFile, 'utf8');
-    
+
     return {
       configured: true,
       accessible: true,
@@ -127,7 +127,7 @@ async function testPvc() {
 async function getPodInfo() {
   const podName = process.env.HOSTNAME || os.hostname();
   const podIP = getHostIP();
-  
+
   return {
     name: podName,
     ip: podIP,
@@ -157,11 +157,10 @@ function getHostIP() {
   return '127.0.0.1';
 }
 
-// Get environment information
 function getEnvironment() {
   // Get all environment variables
   const allEnvVars = { ...process.env };
-  
+
   // Remove sensitive information
   const sensitiveKeys = ['DB_CONNECTION_STRING', 'PASSWORD', 'SECRET', 'KEY', 'TOKEN'];
   for (const key of Object.keys(allEnvVars)) {
@@ -171,18 +170,19 @@ function getEnvironment() {
       }
     }
   }
-  
+
   // Get configured environment
   const environment = process.env.ENVIRONMENT || 'not set';
-  
+  const colorTheme = process.env.COLOR_THEME || 'blue';
+
   return {
     configured: environment !== 'not set',
     current: environment,
+    colorTheme: colorTheme,
     variables: allEnvVars
   };
 }
 
-// API route for all test data as JSON
 app.get('/api/status', async (req, res) => {
   try {
     const [dbStatus, pvcStatus, podInfo, envInfo] = await Promise.all([
@@ -191,7 +191,7 @@ app.get('/api/status', async (req, res) => {
       getPodInfo(),
       getEnvironment()
     ]);
-    
+
     res.json({
       timestamp: new Date().toISOString(),
       pod: podInfo,

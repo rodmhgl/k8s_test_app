@@ -8,4 +8,5 @@ metadata:
     release: {{ .Release.Name }}
 data:
   ENVIRONMENT: {{ .Values.environment | quote }}
+  COLOR_THEME: {{ .Values.colorTheme | default "blue" | quote }}
   PORT: "3000"

@@ -4,3 +4,4 @@ metadata:
   name: k8s-test-app-config
 data:
   ENVIRONMENT: "production"
+  COLOR_THEME: "green"

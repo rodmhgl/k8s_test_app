@@ -1,3 +1,4 @@
 namePrefix: "dev-"
 environment: "development"
+colorTheme: "blue"
 replicaCount: 1
