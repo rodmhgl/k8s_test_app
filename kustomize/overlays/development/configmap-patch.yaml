@@ -4,4 +4,4 @@ metadata:
   name: k8s-test-app-config
 data:
   ENVIRONMENT: "development"
-  COLOR_THEME: "blue"
+  COLOR_THEME: "red"
