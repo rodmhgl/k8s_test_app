@@ -192,8 +192,9 @@
             fetch('/api/status')
                 .then(response => response.json())
                 .then(data => {
-                    // Apply color theme from environment
-                    applyColorTheme(data.environment.colorTheme);
+                    // Apply color theme from environment - with console log for debugging
+                    console.log("Applying color theme:", data.environment.colorTheme);
+                    applyThemeColors(data.environment.colorTheme || "blue");
 
                     updatePodInfo(data.pod);
                     updateEnvironmentInfo(data.environment);
@@ -213,47 +214,102 @@
                 });
         }
 
-        function applyColorTheme(theme) {
-            // Default theme colors
-            let headerColor = '#2c3e50';
-            let cardHeaderColor = '#3498db';
-            let buttonColor = '#3498db';
-            let buttonHoverColor = '#2980b9';
+        // Direct approach to apply theme colors
+        function applyThemeColors(theme) {
+            console.log("Theme being applied:", theme);
 
-            // Set colors based on theme
-            switch (theme) {
-                case 'green':
-                    headerColor = '#27ae60';
-                    cardHeaderColor = '#2ecc71';
-                    buttonColor = '#27ae60';
-                    buttonHoverColor = '#219a52';
-                    break;
-                case 'red':
-                    headerColor = '#c0392b';
-                    cardHeaderColor = '#e74c3c';
-                    buttonColor = '#c0392b';
-                    buttonHoverColor = '#a33025';
-                    break;
-                case 'purple':
-                    headerColor = '#8e44ad';
-                    cardHeaderColor = '#9b59b6';
-                    buttonColor = '#8e44ad';
-                    buttonHoverColor = '#7d3c98';
-                    break;
-                case 'orange':
-                    headerColor = '#d35400';
-                    cardHeaderColor = '#e67e22';
-                    buttonColor = '#d35400';
-                    buttonHoverColor = '#ba4a00';
-                    break;
-                // Default blue theme
+            // Theme color configurations
+            const themes = {
+                blue: {
+                    header: '#2c3e50',
+                    cardHeader: '#3498db',
+                    button: '#3498db',
+                    buttonHover: '#2980b9',
+                    background: '#f5f7f9'
+                },
+                green: {
+                    header: '#27ae60',
+                    cardHeader: '#2ecc71',
+                    button: '#27ae60',
+                    buttonHover: '#219a52',
+                    background: '#e8f5e9'
+                },
+                red: {
+                    header: '#c0392b',
+                    cardHeader: '#e74c3c',
+                    button: '#c0392b',
+                    buttonHover: '#a33025',
+                    background: '#ffebee'
+                },
+                purple: {
+                    header: '#8e44ad',
+                    cardHeader: '#9b59b6',
+                    button: '#8e44ad',
+                    buttonHover: '#7d3c98',
+                    background: '#f3e5f5'
+                },
+                orange: {
+                    header: '#d35400',
+                    cardHeader: '#e67e22',
+                    button: '#d35400',
+                    buttonHover: '#ba4a00',
+                    background: '#fff3e0'
+                }
+            };
+
+            // Get the colors for the selected theme, or use blue as default
+            const colors = themes[theme] || themes.blue;
+
+            // Apply theme colors directly to elements
+            // Main heading
+            document.querySelectorAll('h1').forEach(el => {
+                el.style.color = colors.header;
+            });
+
+            // Card headers
+            document.querySelectorAll('.card h2').forEach(el => {
+                el.style.color = colors.cardHeader;
+            });
+
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshBtn');
+            if (refreshBtn) {
+                refreshBtn.style.backgroundColor = colors.button;
+                refreshBtn.addEventListener('mouseover', function () {
+                    this.style.backgroundColor = colors.buttonHover;
+                });
+                refreshBtn.addEventListener('mouseout', function () {
+                    this.style.backgroundColor = colors.button;
+                });
             }
 
-            // Apply colors to CSS variables
-            document.documentElement.style.setProperty('--header-color', headerColor);
-            document.documentElement.style.setProperty('--card-header-color', cardHeaderColor);
-            document.documentElement.style.setProperty('--button-color', buttonColor);
-            document.documentElement.style.setProperty('--button-hover-color', buttonHoverColor);
+            // Background color
+            document.body.style.backgroundColor = colors.background;
+
+            // Add an environment indicator 
+            let envIndicator = document.getElementById('environment-indicator');
+            if (!envIndicator) {
+                envIndicator = document.createElement('div');
+                envIndicator.id = 'environment-indicator';
+                envIndicator.style.backgroundColor = colors.cardHeader;
+                envIndicator.style.color = 'white';
+                envIndicator.style.padding = '10px';
+                envIndicator.style.textAlign = 'center';
+                envIndicator.style.fontWeight = 'bold';
+                envIndicator.style.marginBottom = '15px';
+                envIndicator.style.borderRadius = '4px';
+
+                // Insert before first card
+                const firstCard = document.querySelector('.card');
+                if (firstCard && firstCard.parentNode) {
+                    firstCard.parentNode.insertBefore(envIndicator, firstCard);
+                }
+            }
+
+            // Update the environment indicator text
+            envIndicator.textContent = 'Current Theme: ' + theme.toUpperCase();
+
+            console.log("Theme applied successfully");
         }
 
         function updatePodInfo(podData) {
