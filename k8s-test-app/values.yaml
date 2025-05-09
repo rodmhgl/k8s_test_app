@@ -4,7 +4,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/rodmhgl/k8s-test-app
   tag: "latest"
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 environment: "development"
 

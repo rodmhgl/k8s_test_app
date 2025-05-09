@@ -18,7 +18,7 @@ spec:
       containers:
         - name: k8s-test-app
           image: ghcr.io/rodmhgl/k8s-test-app:latest
-          imagePullPolicy: IfNotPresent
+          imagepullPolicy: Always
           ports:
             - containerPort: 3000
           env:
