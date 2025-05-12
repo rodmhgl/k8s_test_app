@@ -9,17 +9,17 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: www.azurelaboratory.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: k8s-test-app-service
-                port:
-                  number: 80
+  - host: www.azurelaboratory.com
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: k8s-test-app-service
+              port:
+                number: 80
   tls:
-    - hosts:
-        - www.azurelaboratory.com
-      secretName: testapp-tls
+  - hosts:
+    - www.azurelaboratory.com
+    secretName: testapp-tls
