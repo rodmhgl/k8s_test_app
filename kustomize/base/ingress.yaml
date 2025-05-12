@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: kustomized.azurelaboratory.com
+    - host: kustomize.azurelaboratory.com
       http:
         paths:
           - path: /
@@ -21,5 +21,5 @@ spec:
                   number: 80
   tls:
     - hosts:
-        - kustomized.azurelaboratory.com
+        - kustomize.azurelaboratory.com
       secretName: kustomize-testapp-tls
