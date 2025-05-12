@@ -4,7 +4,6 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod-dns
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
-    nginx.ingress.kubernetes.io/default-backend: k8s-test-app-service
     # nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
   name: testapp-ingress
 spec:
