@@ -2,6 +2,5 @@ namePrefix: "dev-"
 environment: "development"
 colorTheme: "blue"
 replicaCount: 1
-ingress:
-  enabled: true
-  host: dev-kustomize.azurelaboratory.com
+host: dev-kustomize.azurelaboratory.com
+tlsSecretName: dev-kustomize-tls
