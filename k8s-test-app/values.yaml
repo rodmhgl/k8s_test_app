@@ -22,3 +22,7 @@ persistentVolume:
   enabled: true
   size: 1Gi
   mountPath: /data
+
+ingress:
+  enabled: true
+  host: testapp.example.com
