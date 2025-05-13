@@ -16,7 +16,7 @@ spec:
           pathType: Prefix
           backend:
             service:
-              name: k8s-test-app-service
+              name: {{ .Values.namePrefix }}k8s-test-app-service
               port:
                 number: 80
   tls:

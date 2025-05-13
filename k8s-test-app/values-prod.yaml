@@ -2,5 +2,5 @@ namePrefix: "prod-"
 environment: "production"
 colorTheme: "green"
 replicaCount: 3
-host: prod-kustomize.azurelaboratory.com
-tlsSecretName: prod-kustomize-tls
+host: prod-helm.azurelaboratory.com
+tlsSecretName: prod-helm-tls
