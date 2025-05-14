@@ -2,5 +2,5 @@ namePrefix: "prod-"
 environment: "production"
 colorTheme: "green"
 replicaCount: 1
-host: prod-helm.azurelaboratory.com
+host: prod-helm.upcloud.azurelaboratory.com
 tlsSecretName: prod-helm-tls
